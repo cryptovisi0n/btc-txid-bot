@@ -1,16 +1,17 @@
 const Telebot = require("telebot");
 const TXID = require("./txid");
-const asyncForEach = require("./forEach");
-const blockExplorer = require("blockchain.info").blockexplorer;
+const { token } = require("./config.js");
 
 const bot = new Telebot({
-  token: "",
+  token,
   polling: {
     interval: 5000
   }
 });
 
-const txid = new TXID({
+//Set your minimum confirmation-level here
+//After how many confirmations would you like to get notified?
+const Txid = new TXID({
   minConfirmations: 1
 });
 
@@ -20,15 +21,18 @@ bot.on(["/txAdd"], (msg, props) => {
   const regExp = /[a-z0-9]{64,64}/;
   const txid = msg.text.match(regExp);
 
-  if (responseAdd) {
-    return bot.sendMessage(id, `✅ TXID ${txid} added for observation 🧐`, {
-      replyToMessage
-    });
-  } else {
-    return bot.sendMessage(id, "❌ TXID still being observed", {
-      replyToMessage
-    });
-  }
+  const responseOnAddTXID = Txid.add(txid[0], replyToMessage);
+  console.log(responseOnAddTXID);
+
+  // if (responseAdd) {
+  //   return bot.sendMessage(id, `✅ TXID ${txid} added for observation 🧐`, {
+  //     replyToMessage
+  //   });
+  // } else {
+  //   return bot.sendMessage(id, "❌ TXID still being observed", {
+  //     replyToMessage
+  //   });
+  // }
 });
 
 bot.on(["/txDel"], (msg, props) => {
